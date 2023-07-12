@@ -32,12 +32,17 @@ def add_contact(*args):
 @input_error
 def change_contact(*args):
     name = Name(args[0])
-    phone = Phone(args[1])
-    if name in addressbook.data:
-        addressbook.data[name].edit_phone(phone)
-        return f"Номер телефону для контакту {name} успішно змінено на {phone}!"
-    else:
-        raise KeyError
+    old_phone = Phone(args[1])
+    new_phone = Phone(args[2])
+    rec: Record = addressbook.get(str(name))
+    if rec:
+        return rec.edit_phone(old_phone, new_phone)
+    return f"No contact wit name {name}"
+    # if name in addressbook.data:
+    #     addressbook.data[name].edit_phone(phone)
+    #     return f"Номер телефону для контакту {name} успішно змінено на {phone}!"
+    # else:
+    #     raise KeyError
 
 
 @input_error
@@ -52,9 +57,9 @@ def phone_command(*args):
 def show_all_contacts():
     if addressbook.data:
         result = "Список контактів:\n"
-        for name, phone in addressbook.data.items():
-            result += f"{name}: {Record.phones[0]}\n"
-        return result
+        # for rec in addressbook.values():
+        #     result += f"{name}: {Record.phones[0]}\n"
+        return result + "/n".join(str(r) for r in addressbook.values())
     else:
         return "Список контактів порожній."
 
