@@ -2,8 +2,6 @@ from classes import Name, Phone, Record, AddressBook
 
 addressbook = AddressBook()
 
-# contacts = {}
-
 
 def input_error(func):
     def wrapper(*args, **kwargs):
@@ -25,26 +23,27 @@ def add_contact(*args):
     phone = Phone(args[1])
     rec = Record(name, phone)
     return addressbook.add_record(rec)
-    # contacts[name] = phone
-    # return f"Контакт {name} з номером {phone} успішно доданий!"
 
 
 @input_error
 def change_contact(*args):
     name = Name(args[0])
-    phone = Phone(args[1])
-    if name in addressbook.data:
-        addressbook.data[name].edit_phone(phone)
-        return f"Номер телефону для контакту {name} успішно змінено на {phone}!"
-    else:
-        raise KeyError
+    old_phone = Phone(args[1])
+    new_phone = Phone(args[2])
+    rec: Record = addressbook.get(str(name))
+    if rec:
+        return rec.edit_phone(old_phone, new_phone)
+    return f"No contact with name {name}"
 
 
 @input_error
 def phone_command(*args):
     name = Name(args[0])
-    if name in addressbook.data:
-        return f"Номер телефону для контакту {name}: {addressbook.data[name].phones[0]}"
+    phone = Phone(args[1])
+    rec: Record = addressbook.get(str(name))
+    if rec:
+        return rec.remove_phone(phone)
+    #    return f"Номер телефону для контакту {name}: {addressbook.data[name].phones[0]}"
     else:
         raise KeyError
 
@@ -52,9 +51,9 @@ def phone_command(*args):
 def show_all_contacts():
     if addressbook.data:
         result = "Список контактів:\n"
-        for name, phone in addressbook.data.items():
-            result += f"{name}: {Record.phones[0]}\n"
-        return result
+        # for rec in addressbook.values():
+        # result += f"{name}: {Record.phones[0]}\n"
+        return result + "\n".join(str(r) for r in addressbook.values())
     else:
         return "Список контактів порожній."
 
@@ -88,7 +87,6 @@ def handle_command(command):
 
 def main():
     print("Вітаємо у боті-асистенті!")
-
     while True:
         command = input("Введіть команду: ")
         response = handle_command(command)
