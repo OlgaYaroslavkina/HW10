@@ -27,6 +27,7 @@ class Record:
         if phone:
             self.add_phone(phone)
 
+    def add_phone(self, phone: Phone):
         self.phones.append(phone)
 
     def __str__(self) -> str:
