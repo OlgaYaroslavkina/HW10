@@ -71,12 +71,12 @@ def exit_command(*args):
 
 
 COMMANDS = {
-    hello_command: ("hello"),
+    hello_command: ("hello",),
     add_command: ("add", "+"),
     change_command: ("change", "зміни"),
-    remove_command: ("remove"),
+    remove_command: ("remove",),
     show_all_command: ("show all"),
-    exit_command: ("good bye", "close", "вийти"),
+    exit_command: ("good bye", "close", "exit"),
 }
 
 
