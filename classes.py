@@ -44,11 +44,9 @@ class Record:
         self.phones = [p for p in self.phones if p.value != phone]
         for idx, p in enumerate(self.phones):
             if p.value == phone.value:
-                return self.phones.pop(idx)
-            # for idx, p in enumerate(self.phones):
-            # if phone.value == p.value:
-            #    return self.phones.pop(idx)
-            # return f"{phone} not present in phones of contact {self.name}"
+                return (
+                    f"Phone:{self.phones.pop(idx)} - was remove in contact {self.name}"
+                )
 
     def __str__(self) -> str:
         phones = "; ".join(str(p) for p in self.phones) if self.phones else "not added"
