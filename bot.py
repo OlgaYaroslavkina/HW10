@@ -1,6 +1,6 @@
 from classes import Name, Phone, Record, AddressBook
 
-addressbook = AddressBook()
+address_book = AddressBook()
 
 
 def input_error(func):
@@ -18,42 +18,46 @@ def input_error(func):
 
 
 @input_error
-def add_contact(*args):
+def add_command(*args):
     name = Name(args[0])
     phone = Phone(args[1])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return rec.add_phone(phone)
     rec = Record(name, phone)
-    return addressbook.add_record(rec)
+    return address_book.add_record(rec)
 
 
 @input_error
-def change_contact(*args):
+def change_command(*args):
     name = Name(args[0])
     old_phone = Phone(args[1])
     new_phone = Phone(args[2])
-    rec: Record = addressbook.get(str(name))
+    rec: Record = address_book.get(str(name))
     if rec:
-        return rec.edit_phone(old_phone, new_phone)
-    return f"No contact with name {name}"
+        return rec.change_phone(old_phone, new_phone)
+    return f"No contact with name {name} in address book"
 
 
 @input_error
-def phone_command(*args):
+def remove_command(*args):
     name = Name(args[0])
     phone = Phone(args[1])
-    rec: Record = addressbook.get(str(name))
+    rec: Record = address_book.get(str(name))
     if rec:
         return rec.remove_phone(phone)
-    #    return f"Номер телефону для контакту {name}: {addressbook.data[name].phones[0]}"
-    else:
-        raise KeyError
+    # else:
+    return f"No contact with name {name} in address book"
 
 
-def show_all_contacts():
-    if addressbook.data:
+def unknown_command(*args):
+    return "Введіть іншу команду"
+
+
+def show_all_command(*args):
+    if address_book.data:
         result = "Список контактів:\n"
-        # for rec in addressbook.values():
-        # result += f"{name}: {Record.phones[0]}\n"
-        return result + "\n".join(str(r) for r in addressbook.values())
+        return result + "\n".join(str(r) for r in address_book.values())
     else:
         return "Список контактів порожній."
 
@@ -67,31 +71,33 @@ def exit_command(*args):
 
 
 COMMANDS = {
-    hello_command: ["hello"],
-    add_contact: ["add"],
-    change_contact: ["change"],
-    phone_command: ["phone"],
-    show_all_contacts: ["show all"],
-    exit_command: ["good bye", "close", "exit"],
+    hello_command: ("hello"),
+    add_command: ("add", "+"),
+    change_command: ("change", "зміни"),
+    remove_command: ("remove"),
+    show_all_command: ("show all"),
+    exit_command: ("good bye", "close", "вийти"),
 }
 
 
 @input_error
-def handle_command(command):
+def parser(text: str):
     for cmd, keywords in COMMANDS.items():
         for keyword in keywords:
-            if command.lower().startswith(keyword):
-                return cmd(*command.lower().replace(keyword, "").strip().split())
-    return "Невідома команда. Спробуйте ще раз."
+            if text.lower().startswith(keyword):
+                data = text[len(keyword) :].strip().split()
+                return cmd, data
+    return unknown_command, []
 
 
 def main():
     print("Вітаємо у боті-асистенті!")
     while True:
-        command = input("Введіть команду: ")
-        response = handle_command(command)
-        print(response)
-        if isinstance(response, str) and response == "Good bye!":
+        user_input = input("Введіть команду: ")
+        cmd, data = parser(user_input)
+        result = cmd(*data)
+        print(result)
+        if cmd == exit_command:
             break
 
 
